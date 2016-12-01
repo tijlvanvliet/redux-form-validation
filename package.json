@@ -1,7 +1,7 @@
 {
   "name": "redux-form-validation",
   "version": "0.0.8",
-  "description": "An helper to make redux form validation easyer",
+  "description": "An helper to make redux form validation easyer, but now with a change.",
   "main": "lib/index.js",
   "jsnext:main": "./src/index.js",
   "repository": {
@@ -21,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/tijlvanvliet/redux-form-validation/issues"
   },
-  "homepage": "https://github.com/CosticaPuntaru/redux-form-validation#readme",
+  "homepage": "https://github.com/tijlvanvliet/redux-form-validation#readme",
   "peerDependencies": {
     "react-redux": "^3.0.0 || ^4.0.0 || ^5.0.0",
     "redux": "^3.3.1",
