@@ -6,7 +6,7 @@
   "jsnext:main": "./src/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CosticaPuntaru/redux-form-validation.git"
+    "url": "git+https://github.com/tijlvanvliet/redux-form-validation.git"
   },
   "keywords": [
     "react",
@@ -19,7 +19,7 @@
   "author": "Costica Puntaru <costica.puntaru@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/CosticaPuntaru/redux-form-validation/issues"
+    "url": "https://github.com/tijlvanvliet/redux-form-validation/issues"
   },
   "homepage": "https://github.com/CosticaPuntaru/redux-form-validation#readme",
   "peerDependencies": {
