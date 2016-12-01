@@ -18,36 +18,63 @@ export function generateAsyncValidation(validationConfig) {
         var promiseList = [Promise.resolve()];
         var errors = {};
 
-        function addError(field, validatorName, message = true) {
-            if (!errors[field]) {
-                errors[field] = {};
+        function addError(field, validatorName, message = true, error) {
+            if (!error[field]) {
+                error[field] = {};
             }
-            errors[field][validatorName] = message;
+            error[field][validatorName] = message;
 
+        }
+
+        function addHasError(fieldName, validation, validationType, error) {
+            var hasError = validationStore[validationType](fieldName, values[fieldName], validation[validationType], dispatch, values, validation);
+            if (isPromise(hasError)) {
+                promiseList.push(new Promise((resolve, reject)=> {
+                    hasError.then(resolve).catch((msg) => {
+                        console.log('promise has error', msg);
+                        addError(fieldName, validationType, msg, error);
+                        resolve();
+                    })
+                }))
+            } else if (hasError) {
+                addError(fieldName, validationType, hasError, error);
+            }
+        }
+
+        function checkField(fieldName, validation, error) {
+          if (typeof validation === 'object') {
+              Object.keys(validation).map((validationType) => {
+                  if(fieldName.includes('.') && (typeof validationStore[validationType] === 'function')) {
+                    const names = fieldName.split('.');
+                    const parent = names[0];
+                    if (!error[parent]) {
+                        error[parent] = {};
+                    }
+                    names.shift();
+                    addHasError(names.join('.'), validation, validationType, error[parent]);
+                  }
+                  else if((typeof validationStore[validationType] === 'function')) {
+                    addHasError(fieldName, validation, validationType, error);
+                  } /* else if(typeof validation[validationType] === 'object') {
+                    Object.keys(validation).map((fieldnameChild) => {
+                      //if((typeof validationStore[validationType] != 'function')) {
+                        if (!error[fieldName]) {
+                            error[fieldName] = {};
+                        }
+                        checkField(fieldnameChild, validation[fieldnameChild], error[fieldName]);
+                      //}
+                    });
+
+                  }*/ else {
+                    return;
+                  }
+              })
+          }
         }
 
         Object.keys(validationConfig).map((fieldName) => {
             var validation = validationConfig[fieldName];
-            if (typeof validation === 'object') {
-                Object.keys(validation).map((validationType) => {
-                    if (typeof validationStore[validationType] != 'function') {
-                        return;
-                    }
-                    var hasError = validationStore[validationType](fieldName, values[fieldName], validation[validationType], dispatch, values, validation);
-                    if (isPromise(hasError)) {
-                        promiseList.push(new Promise((resolve, reject)=> {
-                            hasError.then(resolve).catch((msg) => {
-                                console.log('promise has error', msg);
-                                addError(fieldName, validationType, msg);
-                                resolve();
-                            })
-                        }))
-
-                    } else if (hasError) {
-                        addError(fieldName, validationType, hasError);
-                    }
-                })
-            }
+            checkField(fieldName,validation, errors);
         });
         return Promise.all(promiseList).then(()=> {
             if (Object.keys(errors).length) {
