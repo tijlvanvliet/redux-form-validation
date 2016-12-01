@@ -26,8 +26,8 @@ export function generateAsyncValidation(validationConfig) {
 
         }
 
-        function addHasError(fieldName, validation, validationType, error) {
-            var hasError = validationStore[validationType](fieldName, values[fieldName], validation[validationType], dispatch, values, validation);
+        function addHasError(fieldName, validation, validationType, value, error) {
+            var hasError = validationStore[validationType](fieldName, value, validation[validationType], dispatch, values, validation);
             if (isPromise(hasError)) {
                 promiseList.push(new Promise((resolve, reject)=> {
                     hasError.then(resolve).catch((msg) => {
@@ -51,10 +51,11 @@ export function generateAsyncValidation(validationConfig) {
                         error[parent] = {};
                     }
                     names.shift();
-                    addHasError(names.join('.'), validation, validationType, error[parent]);
+                    const name = names.join('.');
+                    addHasError(name, validation, validationType, values[parent][name], error[parent]);
                   }
                   else if((typeof validationStore[validationType] === 'function')) {
-                    addHasError(fieldName, validation, validationType, error);
+                    addHasError(fieldName, validation, validationType, values[fieldName], error);
                   } /* else if(typeof validation[validationType] === 'object') {
                     Object.keys(validation).map((fieldnameChild) => {
                       //if((typeof validationStore[validationType] != 'function')) {
